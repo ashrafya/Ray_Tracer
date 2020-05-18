@@ -1,6 +1,7 @@
 from bases import point, vector
 from matrices import matrix
 from math import cos, sin, pi
+# importing all the dependancies from previous code
 
 
 def translation(x, y, z):
