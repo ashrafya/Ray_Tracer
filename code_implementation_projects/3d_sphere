@@ -1,0 +1,42 @@
+from bases import point
+from canvas_color import color, canvas
+from sphere import sphere
+from ray import ray
+from material import material, point_light
+
+ray_origin = point(0, 0, -5)
+wall_z = 10
+
+wall_size = 7
+
+canvas_pixels = 50
+
+pixel_size = wall_size/canvas_pixels
+
+half = wall_size/2
+
+canv = canvas(canvas_pixels, canvas_pixels, 0, 0, 0)
+shape = sphere()
+m = material(colour=color(255, 255, 0))
+""" colour of material on scale of 255 """
+shape.set_material(m)
+
+light = point_light(point(-10, 10, -10), color(1, 1, 1))
+""" light colour has to be ona  scale of one """
+
+for y in range(canvas_pixels):
+    print('line {} of {}'.format(y+1, canvas_pixels))
+    world_y = half - pixel_size * y
+    for x in range(canvas_pixels):
+        world_x = -half + pixel_size * x
+        position = point(world_x, world_y, wall_z)
+        r = ray(ray_origin, (position-ray_origin).normalize())
+        hit = shape.intersect(r)
+        if hit:
+            point_l = r.position(hit[0]['time'])
+            normal = hit[0]['object'].normal_at(point_l)
+            eye = r.direction * -1
+            COLOR = hit[0]['object'].material.Lighting(light, point_l, eye, normal)
+            canv.write_canvas(x, y, COLOR)
+
+canv.to_ppm(filename='ch6_test')

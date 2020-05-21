@@ -76,7 +76,7 @@ class Tuple:
 
     def __mul__(self, other):
         """
-        returns teh unary multiply on tuples
+        returns the unary multiply on tuples
         """
         x = self.val[0] * other
         y = self.val[1] * other
@@ -124,21 +124,24 @@ class Tuple:
             total += self.val[i] * other.val[i]
         return total
 
+    def reflect(self, normal):
+        return self - normal * 2 * self.dot(normal)
+
 
 class point(Tuple):
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, w=1.0):
         """
         sets the w component to zero for a point
         """
-        super().__init__(x, y, z, 1.0)
+        super().__init__(x, y, z, w)
 
 
 class vector(Tuple):
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, w=0.0):
         """
         sets the w value for the vector to 0
         """
-        super().__init__(x, y, z, 0.0)
+        super().__init__(x, y, z, w)
 
     def cross(self, other):
         """
@@ -148,6 +151,7 @@ class vector(Tuple):
         return vector(self.val[1]*other.val[2] - self.val[2]*other.val[1],
                       self.val[2]*other.val[0] - self.val[0]*other.val[2],
                       self.val[0]*other.val[1] - self.val[1]*other.val[0])
+
 
 
 if __name__ == '__main__':

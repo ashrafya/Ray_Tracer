@@ -1,16 +1,21 @@
 from bases import point
 from math import sqrt
 from matrices import identity_matrix
+from material import material
 
 
 class sphere:
-    def __init__(self, transform_within=identity_matrix, material=None):
+    def __init__(self, transform_within=identity_matrix, set_material=None):
         """
         these values are set to none for now but will be changed in due time
         - transform_within has been set to the identity matrix
+        A SPHERE IS ALWAYS SET TO THE DEFAULT MATERIAL
         """
         self.transform_within = transform_within
-        self.material = material
+        if set_material == None:
+            self.material = material()
+        else:
+            self.material = set_material
 
     def Transform_Within(self):
         """
@@ -45,10 +50,20 @@ class sphere:
             return ()
         t1 = (-b - sqrt(discriminant))/(2 * a)
         t2 = (-b + sqrt(discriminant)) / (2 * a)
-        return [{'time': t1, 'object':self}, {'time': t2, 'object':self}]
+        return [{'time': t1, 'object': self}, {'time': t2, 'object': self}]
 
-    def local_normal(self, object_point):
-        pass
+    def set_material(self, set_material):
+        self.material = set_material
+
+    def normal_at(self, p):
+        """
+        returns the normalized normal at that point
+        """
+        object_point = self.transform_within.inverse().multiply_tuple(p)
+        object_normal = object_point - point(0, 0, 0)
+        world_normal = self.transform_within.inverse().transpose().multiply_tuple(object_normal)
+        world_normal.val[3] = 0.0
+        return world_normal.normalize()
 
     def __str__(self):
         return 'transform = {}\nmaterial = {}'.format(self.transform_within, self.material)
