@@ -43,10 +43,10 @@ class Tuple:
         """
         checks if the two tuples are equal or not
         """
-        return(equal(self.val[0], other.val[0])
-               and equal(self.val[1], other.val[1])
-               and equal(self.val[2], other.val[2])
-               and equal(self.val[3], other.val[3]))
+        return(isclose(self.val[0], other.val[0])
+               and isclose(self.val[1], other.val[1])
+               and isclose(self.val[2], other.val[2])
+               and isclose(self.val[3], other.val[3]))
 
     def __sub__(self, other):
         """
@@ -71,8 +71,11 @@ class Tuple:
     def __neg__(self):
         """
         returns the negated value of the tuple, unary
+
+        COULD BE A POSSIBLE ERROR SINCE THE SELF.VAL[3] IS NOT NEGATED
+        BE AWARRRREEEE OF THISSSSSSS
         """
-        return Tuple(-self.val[0], -self.val[1], -self.val[2], -self.val[3])
+        return Tuple(-self.val[0], -self.val[1], -self.val[2], self.val[3])
 
     def __mul__(self, other):
         """
@@ -107,7 +110,7 @@ class Tuple:
         """
         assert(self.is_vector())
         mag = self.magnitude()
-        return Tuple(self.val[0]/mag,
+        return vector(self.val[0]/mag,
                      self.val[1]/mag,
                      self.val[2]/mag,
                      self.val[3]/mag)
@@ -153,12 +156,29 @@ class vector(Tuple):
                       self.val[0]*other.val[1] - self.val[1]*other.val[0])
 
 
+def IdentifyHit(intersections):
+    bestHit = None
+    for intersection in intersections:
+        if intersection['time'] < 0:
+            continue
+        if not bestHit or bestHit['time'] > intersection['time']:
+            bestHit = intersection
+    return bestHit
+
+
 
 if __name__ == '__main__':
     """
     Testing for the above functions, you can play around with them
     """
-    x = point(1, 1, 1)
+    v = vector(0, -1, 0)
+    n = vector(sqrt(2)/2, sqrt(2)/2, 0)
+    r = v.reflect(n)
+    print(r)
+    # x = point(1, 1, 1)
+    # a = vector(2, 3, 4)
+    # b = vector(2, 3, 4)
+    # print(a.dot(b))
     # y = vector(2, 2, 2)
     # a = point(1, 1, 1)
     # z = vector(6, 36, 2)
