@@ -1,5 +1,3 @@
-from PIL import Image
-
 class color:
     """
     Represents an RGB triple of floats, usually in the range 0 - 1.
@@ -12,11 +10,6 @@ class color:
         initialized with a value of '0' for each colour component
         """
         # if values are inputted as a factor of 1, they should be multiplied to be factors of 255
-        if r <= 1 and g <= 1 and b <= 1:
-            r = r * 255
-            g = g * 255
-            b = b * 255
-
         self.red = r
         self.green = g
         self. blue = b
@@ -37,17 +30,20 @@ class color:
         """
         return color(self.red - other.red, self.green - other.green, self.blue - other.blue)
 
+    def __str__(self):
+        return '(r={}  g={}  b={})'.format(self.red, self.green, self.blue)
+
     def __mul__(self, other):
         """
         returns a new color, must subtract to itself if need to increase the self color values
         """
-        return color(self.red * other.red, self.green * other.green, self.blue * other.blue)
+        return color(self.red * other, self.green * other, self.blue * other)
 
     def multiply(self, other):
         """
         returns a new color, must subtract to itself if need to increase the self color values
         """
-        return color(self.red * other, self.green * other, self.blue * other)
+        return color(self.red * other.red, self.green * other.green, self.blue * other.blue)
 
 
 class canvas:
@@ -64,7 +60,7 @@ class canvas:
         for i in range(width):
             inner = []
             for j in range(height):
-                inner.append(color(r, b, g))
+                inner.append(color(r, g, b))
             self.canvas.append(inner)
 
     def write_canvas(self, x, y, color=color()):
@@ -76,7 +72,7 @@ class canvas:
         self.canvas[x][y].green = color.green
         self.canvas[x][y].blue = color.blue
 
-    def to_ppm(self):
+    def to_ppm(self, filename='file'):
         header = "P3\n{} {}\n255".format(self.w, self.h)
 
         # Walk through each row and convert the colors to a line of text of
@@ -86,20 +82,20 @@ class canvas:
         for y in range(self.h):
             y_text = []
             for x in range(self.w):
-                if self.canvas[y][x].red < 0:
-                    self.canvas[y][x].red = 0
-                if self.canvas[y][x].red > 255:
-                    self.canvas[y][x].red = 255
-                if self.canvas[y][x].green < 0:
-                    self.canvas[y][x].green = 0
-                if self.canvas[y][x].green > 255:
-                    self.canvas[y][x].green = 255
-                if self.canvas[y][x].blue < 0:
-                    self.canvas[y][x].blue = 0
-                if self.canvas[y][x].blue > 255:
-                    self.canvas[y][x].blue = 255
+                # if self.canvas[y][x].red < 0:
+                #     self.canvas[y][x].red = 0
+                # if self.canvas[y][x].red > 255:
+                #     self.canvas[y][x].red = 255
+                # if self.canvas[y][x].green < 0:
+                #     self.canvas[y][x].green = 0
+                # if self.canvas[y][x].green > 255:
+                #     self.canvas[y][x].green = 255
+                # if self.canvas[y][x].blue < 0:
+                #     self.canvas[y][x].blue = 0
+                # if self.canvas[y][x].blue > 255:
+                #     self.canvas[y][x].blue = 255
 
-                y_text.append("{} {} {}".format(self.canvas[y][x].red, self.canvas[y][x].green, self.canvas[y][x].blue))
+                y_text.append("{} {} {}".format(self.canvas[x][y].red, self.canvas[x][y].green, self.canvas[x][y].blue))
             y_text = " ".join(y_text)
 
             # If the line is 70 or fewer characters in length, then just append
@@ -132,29 +128,29 @@ class canvas:
         # Combine the header plus each of the accumulated lines joined by a
         # newline to be the resulting PPM data.
 
-        f = open("file.ppm", 'w+')
+        f = open("{}.ppm".format(filename), 'w+')
         f.write("{}\n{}\n".format(header, "\n".join(pixel_text)))
         f.close()
         return "{}\n{}\n".format(header, "\n".join(pixel_text))
 
 
-if __name__ == '__main__':
-    one = color(1,2,3)
-    two = color(3,1,4)
-    three = one+two
-    four = one-two
-    five = one*two
-    six = one.multiply(2)
-    print(three.red, three.green, three.blue)
-    print(four.red, four.green, four.blue)
-    print(five.red, five.green, five.blue)
-    print(six.red, six.green, six.blue)
+# if __name__ == '__main__':
+#     one = color(1,2,3)
+#     two = color(3,1,4)
+#     three = one+two
+#     four = one-two
+#     five = one*two
+#     six = one.multiply(2)
+#     print(three.red, three.green, three.blue)
+#     print(four.red, four.green, four.blue)
+#     print(five.red, five.green, five.blue)
+#     print(six.red, six.green, six.blue)
 
     # makes an image with white background and a blue box towards the top left
-    x = canvas(800, 800, 400, 400, 400)
-    print(x.canvas[7][7].red, x.canvas[7][7].green, x.canvas[7][7].blue)
-    for j in range(100, 300):
-        for y in range(100, 300):
-            x.write_canvas(j, y, color(2,0 , 244))
-    print(x.canvas[7][7].red, x.canvas[7][7].green, x.canvas[7][7].blue)
-    x.to_ppm()
+    # x = canvas(800, 800, 0,0, 255)
+    # print(x.canvas[7][7].red, x.canvas[7][7].green, x.canvas[7][7].blue)
+    # for j in range(600, 800):
+    #     for y in range(1, 300):
+    #         x.write_canvas(j, y, color(244, 0, 200))
+    # print(x.canvas[7][7].red, x.canvas[7][7].green, x.canvas[7][7].blue)
+    # x.to_ppm()
