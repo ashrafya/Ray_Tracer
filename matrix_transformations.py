@@ -1,7 +1,6 @@
 from bases import point, vector
 from matrices import matrix
 from math import cos, sin, pi
-# importing all the dependancies from previous code
 
 
 def translation(x, y, z):
@@ -62,11 +61,28 @@ def to_matrix(Tuple):
     return matrix(4, 4, ([[Tuple.val[0], 0, 0, 0], [0, Tuple.val[1], 0, 0], [0, 0, Tuple.val[2], 0], [0, 0, 0, Tuple.val[3]]]))
 
 
-if __name__ == '__main__':
-    """ 
-    tests used to check if the above function are working or not
-    """
-    x = point(-3, 4, 5)
+def view_transform(FROM, TO, UP):
+    forward = TO - FROM
+    forward = forward.normalize()
+    upn = UP.normalize()
+    left = forward.cross(upn)
+    true_up = left.cross(forward)
+    orientation = matrix(4, 4, ([[left.val[0], left.val[1], left.val[2], 0],
+                                  [true_up.val[0], true_up.val[1], true_up.val[2], 0],
+                                  [-forward.val[0], -forward.val[1], -forward.val[2], 0],
+                                  [0, 0, 0, 1]]))
+    return orientation * translation(-FROM.val[0], -FROM.val[1], -FROM.val[2])
+
+
+# if __name__ == '__main__':
+#     FROM = point(1, 3, 2)
+#     TO = point(4, -2, 8)
+#     UP = vector(1, 1, 0)
+#     print(view_transform(FROM, TO, UP))
+#     """
+#     tests used to check if the above function are working or not
+#     """
+#     x = point(-3, 4, 5)
     # y = vector(-3, 4, 5)
     # z = translation(5, -3, 2)
     # inv = z.inverse()
