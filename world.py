@@ -1,11 +1,13 @@
 from material import point_light
-from bases import point, vector
+from bases import point, IdentifyHit, vector, EPSILON
 from canvas_color import color
 from sphere import sphere
-from matrix_transformations import scaling, translation, view_transform
-from ray import ray
-from Intersection import Intersection, Intersections
+from matrix_transformations import translation, scaling
+from Intersection import Intersection
 from operator import itemgetter
+from ray import ray
+from Intersection import Intersections
+
 
 class world:
     def __init__(self, object=[], light=[]):
@@ -50,7 +52,8 @@ class world:
         """
         returns the shade that should be painted at that point of hit
         """
-        return computations['object'].material.Lighting(self.light[0], computations['point'], computations['eyev'], computations['normalv'])
+        shadowed = self.is_shadowed(computations['over_point'])
+        return computations['object'].material.Lighting(self.light[0], computations['point'], computations['eyev'], computations['normalv'], in_shadow=shadowed)
 
     def color_at(self, r):
         """
@@ -76,6 +79,36 @@ class world:
 
     # have the view transform function in the matrix_transformation.py file
 
+    def is_shadowed(self, site):
+        """
+        takes in world and a point and returns if it shaded or not
+        """
+        vector_to_light = (self.Lights()[0].Position() - site)
+        distance = vector_to_light.magnitude()
+
+        # now normalize the vector
+        vector_to_light = vector_to_light.normalize()
+        ray_to_light = ray(site, vector_to_light)
+
+        junctions = self.intersect_world(ray_to_light)
+        h = IdentifyHit(junctions)
+
+        # new = []
+        # for crossing in junctions:
+        #     commit = Intersection(crossing['time'], crossing['object'])
+        #     new.append(commit)
+        # print(new[0].t)
+        # i = Intersections(new)
+        # h = i.hit()     # gets the most relevant hit
+
+        if h and h['time'] < distance:
+            return True
+        else:
+            return False
+
+
+
+
 
 
 def default_world():
@@ -91,7 +124,30 @@ def default_world():
 
 
 if __name__ == '__main__':
-    # w = default_world()
+    # w = world()
+    # w.set_light(point_light(point(0, 0, -10), color(1, 1, 1)))
+    # s1 = sphere()
+    # w.add_object(s1)
+    # s2 = sphere(transform_within=translation(0, 0, 10))
+    # w.add_object(s2)
+    # r = ray(point(0, 0, 5), vector(0, 0, 1))
+    # i = Intersection(4, s2)
+    # comps = i.prepare_computations(r)
+    # c = w.shade_hit(comps)
+    # print(c.red, c.green, c.blue)
+
+    r = ray(point(0, 0, -5), vector(0, 0, 1))
+    shape = sphere()
+    shape.transform_within = translation(0, 0, 1)
+    i = Intersection(5, shape)
+    comps = i.prepare_computations(r)
+    print(comps['over_point'].val[2] < -EPSILON/2)
+    print(comps['point'].val[2] > comps['over_point'].val[2])
+
+#     w = default_world()
+#     p = point(10, -10, 10)
+#     result = w.is_shadowed(p)
+#     print(result)
     # w.set_light(point_light(point(0, 0.25, 0), color(1, 1, 1)))
     # r = ray(point(0, 0, 0), vector(0, 0, 1))
     # i = Intersection(0.5, w.items[1])
@@ -99,11 +155,8 @@ if __name__ == '__main__':
     # c = w.shade_hit(comps)
     # print(c)
 
-    w = default_world()
-    x =w.Items()
-    r = ray(point(0, 0, -5), vector(0, 0, 1))
-    c = w.color_at(r)
-    print(c.red, c.green, c.blue)
-
-
-
+    # w = default_world()
+    # x =w.Items()
+    # r = ray(point(0, 0, -5), vector(0, 0, 1))
+    # c = w.color_at(r)
+    # print(c.red, c.green, c.blue)

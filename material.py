@@ -1,8 +1,6 @@
 from canvas_color import color
-from bases import point, vector
 from matrices import identity_matrix
-from math import pow, sqrt
-
+from math import pow
 
 
 class point_light:
@@ -15,6 +13,7 @@ class point_light:
 
     def Intensity(self):
         return self.intensity
+
 
 class material:
     def __init__(self, colour=color(1, 1, 1), ambient=0.1, diffuse=0.9, specular=0.9, shininess=200.0):
@@ -54,7 +53,7 @@ class material:
     def set_shininess(self, shin):
         self.shininess = shin
 
-    def Lighting(self, light, position, eyev, normalv, objectTransform=identity_matrix):
+    def Lighting(self, light, position, eyev, normalv, in_shadow=False, objectTransform=identity_matrix):
         """
         the phong algorithm implementation to get back 3D lighting simulation
         """
@@ -67,6 +66,9 @@ class material:
 
         # compute the ambient color
         ambient = effective_color * self.Ambient()
+
+        if in_shadow:
+            return ambient
 
         # light_dot_normal represents the cosine of the angle between the light vector and teh normal vector.
         # a negative number means the light is on the other side of the surface
@@ -93,36 +95,3 @@ class material:
                 specular = light.intensity * self.Specular() * factor
         result = ambient + diffuse + specular
         return result
-
-        # effectiveColor = self.ColorAt(position, objectTransform).multiply(light.Intensity())
-        # ambientColor = effectiveColor * self.Ambient()
-        # if inShadow:
-        #     return color(ambientColor[0], ambientColor[1], ambientColor[2])
-        # # If not in shadow, need to combine the following
-        # black = color(0, 0, 0)
-        # diffuseColor = black
-        # specularColor = black
-        #
-        # lightv = (light.Position() - position).normalize()
-        # lightDotNormal = lightv.dot(normalv)
-        #
-        # if lightDotNormal >= 0:
-        #     diffuseColor = effectiveColor * self.Diffuse() * lightDotNormal
-        #
-        #     reflectv = -lightv.reflect(normalv)
-        #     reflectDotEye = reflectv.dot(eyev)
-        #     if reflectDotEye > 0:
-        #         factor = pow(reflectDotEye, self.Shininess())
-        #         specularColor = light.Intensity() * self.Specular() * factor
-        # result = ambientColor + diffuseColor + specularColor
-        # return Color(result[0], result[1], result[2])
-
-
-if __name__ == '__main__':
-    position = point(0, 0, 0)
-    m = material()
-    eyev = vector(0, 0, -1)
-    normalv = vector(0, 0, -1)
-    light = point_light(point(0, 0, 10), color(1, 1, 1))
-    x = m.Lighting(light, position, eyev, normalv)
-    print(x)
